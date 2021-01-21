@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
+import Zoom from '@material-ui/core/Zoom';
+import AddIcon from '@material-ui/icons/Add'
+import Fab from '@material-ui/core/Fab';
 
 function InputArea(props){
+    const [isEmpty, setIsEmpty] = useState(true)
     const [inputNote, setInputNote] = useState({
         title: "",
         content: ""
@@ -22,25 +26,33 @@ function InputArea(props){
             title: "",
             content: ""
         })
+        setIsEmpty(true)
         event.preventDefault()
     }
 
     return<div>
-        <form>
-            <input 
+        <form className="create-note">
+            {!isEmpty && <input 
                 onChange={handleChange} 
                 name="title"
                 type="text" 
-                placeholder="Title" 
-                value={inputNote.title}/>
+                placeholder={"Title"} 
+                value={inputNote.title}/>}
             <textarea 
                 onChange={handleChange} 
+                onClick={()=>setIsEmpty(false)}
                 name="content"
                 type="text" 
-                placeholder="Content" 
+                placeholder="Take a note..." 
                 value={inputNote.content}
-                rows={4}/>
-            <button onClick={(submitNote)}>Add</button>
+                rows={isEmpty? 1 : 4}/>
+            <Zoom in={!isEmpty}>
+                <Fab aria-label="add" onClick={(submitNote)}>
+                    <AddIcon/>
+                </Fab>
+            </Zoom>
+            
+            
         </form>
     </div>
 }
