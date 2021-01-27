@@ -1,39 +1,41 @@
-import React, { useState } from 'react'
+import React, {useState, useEffect} from "react";
+import axios from "axios";
 import Footer from './Footer';
 import Header from './Header';
-import Note from './Note'
-import InputArea from "./InputArea"
+import Note from "./Note";
+import InputArea from "./InputArea";
+
 
 function App(){
-    const [notes, setNotes] = useState([])
+    const [notes, setNotes] = useState([]);
 
-    function addNote(inputNote){
-        setNotes([inputNote, ...notes])
-    }
-
-    function deleteNote(id){
-        setNotes(prevNotes => {
-            return prevNotes.filter((note, index)=>{
-                return index !== id
-            })
-        })
-    }
+    useEffect(()=>{
+        const getNotes = async () => {
+            const response = await axios.get("http://localhost:3001/notes");
+            if (response.data) {
+                const data = response.data;
+                setNotes(data);
+            }
+        };
+        getNotes();
+    }, []);
 
 
     return <div>
         <Header/>
-        <InputArea onAdd={addNote}/>
-        {notes.map((note, index) => 
-            <Note 
-                key={index} 
-                id={index} 
+        <InputArea
+            onAdd={setNotes}
+        />
+        {notes.map((note) => 
+            <Note
+                key={note._id}
+                _id={note._id}
                 title={note.title} 
-                onDelete={deleteNote}
                 content={note.content}
+                onDelete={setNotes}
             />)}
         <Footer/>
     </div>
-     
 }
 
 export default App;

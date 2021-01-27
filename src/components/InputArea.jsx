@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import axios from 'axios'
 import Zoom from '@material-ui/core/Zoom';
 import AddIcon from '@material-ui/icons/Add'
 import Fab from '@material-ui/core/Fab';
@@ -8,30 +9,44 @@ function InputArea(props){
     const [inputNote, setInputNote] = useState({
         title: "",
         content: ""
-    })
+    });
+    const {onAdd} = props;
 
-    function handleChange(event){
-        const {name, value} = event.target
+    const handleChange = (event) => {
+        const {name, value} = event.target;
         setInputNote((prevNote)=>{
             return{
                 ...prevNote,
                 [name]: value
             }
-        })
-    }
+        });
+    };
 
-    function submitNote(event){
-        props.onAdd(inputNote)
+    const submitNote = (event) => {
+        const createNote = async () => {
+            const url = 'http://localhost:3001/note';
+            const options = {
+                headers: { 'Content-Type': 'application/json' }
+            };
+            const response = await axios.post(
+                url,
+                inputNote,
+                options
+            );
+            const {_id, title, content} = response.data.data;
+            onAdd((prevNotes)=>{return [{_id, title, content}, ...prevNotes]});
+        }
+        createNote();
         setInputNote({
             title: "",
             content: ""
-        })
-        setIsEmpty(true)
-        event.preventDefault()
+        });
+        setIsEmpty(true);
+        event.preventDefault();
     }
 
     return<div>
-        <form className="create-note">
+        <form className="create-note" onSubmit={submitNote}>
             {!isEmpty && <input 
                 onChange={handleChange} 
                 name="title"
@@ -39,20 +54,18 @@ function InputArea(props){
                 placeholder={"Title"} 
                 value={inputNote.title}/>}
             <textarea 
-                onChange={handleChange} 
+                onChange={handleChange}
                 onClick={()=>setIsEmpty(false)}
                 name="content"
-                type="text" 
-                placeholder="Take a note..." 
+                type="text"
+                placeholder="Take a note..."
                 value={inputNote.content}
                 rows={isEmpty? 1 : 4}/>
             <Zoom in={!isEmpty}>
-                <Fab aria-label="add" onClick={(submitNote)}>
+                <Fab aria-label="add" type="submit">
                     <AddIcon/>
                 </Fab>
             </Zoom>
-            
-            
         </form>
     </div>
 }
