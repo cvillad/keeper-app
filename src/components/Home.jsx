@@ -3,7 +3,7 @@ import axios from "axios";
 import Footer from './Footer';
 import Header from './Header';
 import Note from "./Note";
-import InputArea from "./InputArea";
+import InputNote from "./InputNote";
 import { Grid } from '@material-ui/core';
 
 function Home(){
@@ -23,7 +23,7 @@ function Home(){
     return (
         <div>
             <Header/>
-            <InputArea
+            <InputNote
                 onAdd={setNotes}/>
             <Grid>
                 <Grid container item xs={12}>  

@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { Typography, Button, Card, Link, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import history from '../history'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -15,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     card: {
         padding: "40px 50px",
         width: 260,
-        height: 380,
+        height: "auto",
         display: "flex",
         justifyContent: "center",
         alignItems: "center"
@@ -57,9 +59,17 @@ const useStyles = makeStyles((theme) => ({
     
 }));
 
+const formSchema = yup.object().shape({
+    email: yup.string().email("Type a valid email").required("Email is required"),
+    password: yup.string().required("Password is required")
+});
+
 const Login = () => {
     const classes = useStyles()
-    const { register, handleSubmit, watch, errors } = useForm({mode: "onChange"});
+    const { register, handleSubmit, formState, errors } = useForm({
+        mode: "onChange",
+        resolver: yupResolver(formSchema)
+    });
     const onSubmit = data => {
         history.push('/home')
     };
@@ -70,15 +80,15 @@ const Login = () => {
                 <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
                     <Typography className={classes.yellowText} variant="h4" >Login</Typography>
 
-                    <TextField className={classes.input} name="email" label="Email" inputRef={register({required: true})}/>
-                    {errors.email && <Typography className={classes.errorMsg}>This field is required</Typography>}
+                    <TextField type="email" className={classes.input} name="email" label="Email" inputRef={register}/>
+                    {errors.email && <Typography className={classes.errorMsg}>{errors.email.email}</Typography>}
 
-                    <TextField className={classes.input} name="password" label="Password" inputRef={register({required: true})} defaultValue=""/>
-                    {errors.password && <Typography className={classes.errorMsg}>This field is required</Typography>}
+                    <TextField type="password" className={classes.input} name="password" label="Password" inputRef={register}/>
+                    {errors.password && <Typography className={classes.errorMsg}>{errors.email.password}</Typography>}
 
                     <div className={classes.buttonContainer}>
                         <Link href="/signup" className={classes.link} >Don't you have an account? Sign Up</Link>
-                        <Button style={{color: "white"}} className={classes.button} variant="contained" size="large" type='submit'>Log in</Button>
+                        <Button disabled={!formState.isValid} style={{color: "white"}} className={classes.button} variant="contained" size="large" type='submit'>Log in</Button>
                     </div>
                 </form>
             </Card>

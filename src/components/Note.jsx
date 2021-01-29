@@ -4,7 +4,7 @@ import axios from "axios"
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Card, Zoom, Button, Typography, CardContent, CardActions, Grid } from '@material-ui/core';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme=>({
     root: {
         margin: 15,
     },
@@ -14,7 +14,7 @@ const useStyles = makeStyles({
     pos: {
       marginBottom: 12,
     },
-});
+}));
 
 const Note = (props) => {
     const classes = useStyles();
@@ -44,7 +44,7 @@ const Note = (props) => {
 
     return (
         <Zoom in={!deleted} onExited={deleteNote}>
-            <Grid item xs={2}>
+            <Grid item xs={6} md={3} lg={2}>
                 <Card className={classes.root}>
                     <CardContent>
                         <Typography className={classes.title} color="textSecondary" gutterBottom>

@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useForm } from "react-hook-form";
 import axios from 'axios';
 import AddIcon from '@material-ui/icons/Add';
 import { TextField, Fab, Zoom, Card } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -11,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "center"
     },
     card: {
+        height: "auto",
         width: 340,
         '& > *': {
             margin: theme.spacing(1),
@@ -19,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     },
     form: {
         width: "auto",
-        margin: 16,
+        margin: "10px 20px",
     },
     input: {
         width: "100%",
@@ -29,33 +33,43 @@ const useStyles = makeStyles((theme) => ({
         position: "relative",
         width: 36,
         height: 36,
-        left: "80%",
+        left: "92%",
         marginTop: 8,
         backgroundColor: "#f5ba13",
         color: "white"
+    },
+    errorMsg: {
+        color: "#bf1650"
     }
 }));
 
-function InputArea(props){
+const formSchema = yup.object().shape({
+    title: yup.string().required(),
+    content: yup.string().required()
+})
+
+const InputNote = (props) => {
     const classes = useStyles();
     const [isEmpty, setIsEmpty] = useState(true)
     const [inputNote, setInputNote] = useState({
         title: "",
         content: ""
     });
+    const { register, handleSubmit, formState, watch } = useForm({
+        mode: "onChange",
+        resolver: yupResolver(formSchema)
+    });
     const {onAdd} = props;
+    const title = watch("title") || "";
+    const content = watch("content") || "";
 
-    const handleChange = (event) => {
-        const {name, value} = event.target;
-        setInputNote((prevNote)=>{
-            return{
-                ...prevNote,
-                [name]: value
-            }
-        });
-    };
+    useEffect(()=>{
+        setInputNote({title, content})
+    }, [title, content])
 
-    const submitNote = (event) => {
+    
+
+    const submitNote = (data) => {
         const createNote = async () => {
             const url = 'http://localhost:3001/note';
             const options = {
@@ -75,7 +89,6 @@ function InputArea(props){
             content: ""
         });
         setIsEmpty(true);
-        event.preventDefault();
     }
 
     return(
@@ -83,26 +96,27 @@ function InputArea(props){
             <Card className={classes.card}>
                 <form 
                     className={classes.form}
-                    onSubmit={submitNote}>
+                    onSubmit={handleSubmit(submitNote)}>
                     {!isEmpty && <TextField
+                        InputProps = {{disableUnderline: true}}
+                        inputRef={register}
                         className={classes.input}
                         label="Title"
-                        onChange={handleChange} 
                         name="title"
-                        type="text" 
-                        value={inputNote.title}/>}
+                        type="text"/>}
                     <TextField
                         multiline
+                        InputProps = {{disableUnderline: true}}
+                        inputRef={register}
                         className={classes.input}
                         label={isEmpty? "Take a note..." : "Content"}
-                        onChange={handleChange}
                         onClick={()=>setIsEmpty(false)}
                         name="content"
                         type="text"
-                        rows={isEmpty? 1 : 4}
-                        value={inputNote.content}
+                        rows={isEmpty? 1 : 5}
+                        //value={inputNote.content}
                     />
-                    <Zoom in={!isEmpty}>
+                    <Zoom in={formState.isValid}>
                         <Fab aria-label="add" type="submit" className={classes.button}>
                             <AddIcon/>
                         </Fab>
@@ -113,4 +127,4 @@ function InputArea(props){
     )
 }
 
-export default InputArea;
+export default InputNote;

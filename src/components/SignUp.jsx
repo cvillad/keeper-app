@@ -1,8 +1,11 @@
 import React from 'react'
+import axios from 'axios';
 import { useForm } from "react-hook-form";
-import { Typography, Button, Card, Link, TextField } from '@material-ui/core';
+import { Typography, Button, Card, TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import history from '../history'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -15,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
     card: {
         padding: "40px 50px",
         width: 260,
-        height: 380,
+        height: "auto",
         display: "flex",
         justifyContent: "center",
         alignItems: "center"
@@ -54,38 +57,60 @@ const useStyles = makeStyles((theme) => ({
         color: "#f5ba13",
         alignSelf: "center"
     }
-    
 }));
+
+const formSchema = yup.object().shape({
+    firstName: yup.string().required("First name is required"),
+    lastName: yup.string().required("Last name is required"),
+    email: yup.string().email("Type a valid email").required("Email is required"),
+    password: yup.string().required("Password is required")
+});
 
 const SignUp = () => {
     const classes = useStyles()
-    const { register, handleSubmit, watch, errors } = useForm({mode: "onChange"});
+    const { register, handleSubmit, formState, errors } = useForm({
+        mode: "onChange",
+        resolver: yupResolver(formSchema)
+    });
+    
+    console.log(formSchema)
     const onSubmit = data => {
-        console.log(data)
-        history.push('/home')
+        const createUser = async () => {
+            const url = 'http://localhost:3001/user';
+            const options = {
+                headers: { 'Content-Type': 'application/json' }
+            };
+            console.log(data)
+            const response = await axios.post(
+                url,
+                data,
+                options
+            );
+            response.data.success ? console.log(response.data.data) : console.log(response.data)
+        }
+        createUser();
     };
 
-    console.log(errors)
     return (
         <div className={classes.root}>
             <Card className={classes.card}>
                 <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
-                    <Typography className={classes.yellowText} variant="h4" >Sing Up</Typography>
+                    <Typography className={classes.yellowText} variant="h4">Sign Up</Typography>
 
-                    <TextField className={classes.input} name="firstName" label="First Name" inputRef={register({required: true})}/>
-                    {errors.firstName && <Typography className={classes.errorMsg}>This field is required</Typography>}
+                    <TextField className={classes.input} name="firstName" label="First Name" inputRef={register}/>
+                    {errors.firstName && <Typography className={classes.errorMsg}>{errors.firstName.message}</Typography>}
 
-                    <TextField className={classes.input} name="lastName" label="Last Name" inputRef={register({required: true})}/>
-                    {errors.lastName && <Typography className={classes.errorMsg}>This field is required</Typography>}
+                    <TextField className={classes.input} name="lastName" label="Last Name" inputRef={register}/>
+                    {errors.lastName && <Typography className={classes.errorMsg}>{errors.lastName.message}</Typography>}
 
-                    <TextField className={classes.input} name="email" label="Email" inputRef={register({required: true})}/>
-                    {errors.email && <Typography className={classes.errorMsg}>This field is required</Typography>}
+                    <TextField className={classes.input} name="email" label="Email" inputRef={register}/>
+                    {errors.email && <Typography className={classes.errorMsg}>{errors.email.message}</Typography>}
 
-                    <TextField className={classes.input} name="password" label="Password" inputRef={register({required: true})} defaultValue=""/>
-                    {errors.password && <Typography className={classes.errorMsg}>This field is required</Typography>}
+                    <TextField type="password" className={classes.input} name="password" label="Password" inputRef={register}/>
+                    {errors.password && <Typography className={classes.errorMsg}>{errors.password.message}</Typography>}
 
                     <div className={classes.buttonContainer}>
-                        <Button style={{color: "white"}} className={classes.button} variant="contained" size="large" type='submit'>Sign Up</Button>
+                        <Button disabled={!formState.isValid} style={{color: "white"}} className={classes.button} variant="contained" size="large" type='submit'>Sign Up</Button>
                     </div>
                 </form>
             </Card>
