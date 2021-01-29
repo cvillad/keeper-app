@@ -1,10 +1,24 @@
 import React, {useState} from 'react'
+import { makeStyles } from '@material-ui/core/styles';
 import axios from "axios"
-import Zoom from '@material-ui/core/Zoom';
-import DeleteIcon from '@material-ui/icons/Delete'
+import DeleteIcon from '@material-ui/icons/Delete';
+import { Card, Zoom, Button, Typography, CardContent, CardActions, Grid } from '@material-ui/core';
 
-function Note(props){
-    const[deleted,setDeleted]=useState(false);
+const useStyles = makeStyles({
+    root: {
+        margin: 15,
+    },
+    title: {
+      fontSize: 14,
+    },
+    pos: {
+      marginBottom: 12,
+    },
+});
+
+const Note = (props) => {
+    const classes = useStyles();
+    const [deleted, setDeleted] = useState(false);
     const {_id, title, content, onDelete} = props;
 
     const deleteNote = async () =>{
@@ -28,15 +42,25 @@ function Note(props){
         }
     };
 
-    return <Zoom in={!deleted} onExited={deleteNote}>
-        <div className='note'>
-            <h1>{title}</h1>
-            <p>{content}</p>
-            <button onClick={()=>setDeleted(true)}>
-                <DeleteIcon/>
-            </button>
-        </div>
-    </Zoom>
+    return (
+        <Zoom in={!deleted} onExited={deleteNote}>
+            <Grid item xs={2}>
+                <Card className={classes.root}>
+                    <CardContent>
+                        <Typography className={classes.title} color="textSecondary" gutterBottom>
+                            {title}
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                            {content}
+                        </Typography>
+                    </CardContent>
+                    <CardActions style={{justifyContent: "flex-end"}}>
+                        <Button style={{minWidth: 0}} onClick={()=>setDeleted(true)} size="small"><DeleteIcon/></Button>
+                    </CardActions>
+                </Card>
+            </Grid>
+        </Zoom>
+    )
 }
 
 export default Note;

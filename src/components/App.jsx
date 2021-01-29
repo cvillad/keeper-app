@@ -1,41 +1,22 @@
-import React, {useState, useEffect} from "react";
-import axios from "axios";
-import Footer from './Footer';
-import Header from './Header';
-import Note from "./Note";
-import InputArea from "./InputArea";
+import React from 'react'
+import {Router, Route, Switch} from 'react-router-dom'
+import history from '../history'
+import Login from './Login'
+import Home from './Home'
+import SignUp from './SignUp'
 
-
-function App(){
-    const [notes, setNotes] = useState([]);
-
-    useEffect(()=>{
-        const getNotes = async () => {
-            const response = await axios.get("http://localhost:3001/notes");
-            if (response.data) {
-                const data = response.data;
-                setNotes(data);
-            }
-        };
-        getNotes();
-    }, []);
-
-
-    return <div>
-        <Header/>
-        <InputArea
-            onAdd={setNotes}
-        />
-        {notes.map((note) => 
-            <Note
-                key={note._id}
-                _id={note._id}
-                title={note.title} 
-                content={note.content}
-                onDelete={setNotes}
-            />)}
-        <Footer/>
-    </div>
+const App = () => {
+    return (
+        <React.Fragment>
+            <Router history={history}>
+                <Switch>
+                    <Route path="/" exact component={Login} />
+                    <Route path="/signup" exact component={SignUp} />
+                    <Route path='/home' exact component={Home}/>
+                </Switch>
+            </Router>
+        </React.Fragment>
+    )
 }
 
 export default App;

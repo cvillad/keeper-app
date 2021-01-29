@@ -1,10 +1,43 @@
-import React, { useState } from 'react'
-import axios from 'axios'
-import Zoom from '@material-ui/core/Zoom';
-import AddIcon from '@material-ui/icons/Add'
-import Fab from '@material-ui/core/Fab';
+import React, { useState } from 'react';
+import axios from 'axios';
+import AddIcon from '@material-ui/icons/Add';
+import { TextField, Fab, Zoom, Card } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        width: "100%",
+        display: "flex",
+        justifyContent: "center"
+    },
+    card: {
+        width: 340,
+        '& > *': {
+            margin: theme.spacing(1),
+            width: '25ch',
+        },
+    },
+    form: {
+        width: "auto",
+        margin: 16,
+    },
+    input: {
+        width: "100%",
+        margin: "5px 0"
+    },
+    button: {
+        position: "relative",
+        width: 36,
+        height: 36,
+        left: "80%",
+        marginTop: 8,
+        backgroundColor: "#f5ba13",
+        color: "white"
+    }
+}));
 
 function InputArea(props){
+    const classes = useStyles();
     const [isEmpty, setIsEmpty] = useState(true)
     const [inputNote, setInputNote] = useState({
         title: "",
@@ -45,29 +78,39 @@ function InputArea(props){
         event.preventDefault();
     }
 
-    return<div>
-        <form className="create-note" onSubmit={submitNote}>
-            {!isEmpty && <input 
-                onChange={handleChange} 
-                name="title"
-                type="text" 
-                placeholder={"Title"} 
-                value={inputNote.title}/>}
-            <textarea 
-                onChange={handleChange}
-                onClick={()=>setIsEmpty(false)}
-                name="content"
-                type="text"
-                placeholder="Take a note..."
-                value={inputNote.content}
-                rows={isEmpty? 1 : 4}/>
-            <Zoom in={!isEmpty}>
-                <Fab aria-label="add" type="submit">
-                    <AddIcon/>
-                </Fab>
-            </Zoom>
-        </form>
-    </div>
+    return(
+        <div className={classes.root}>
+            <Card className={classes.card}>
+                <form 
+                    className={classes.form}
+                    onSubmit={submitNote}>
+                    {!isEmpty && <TextField
+                        className={classes.input}
+                        label="Title"
+                        onChange={handleChange} 
+                        name="title"
+                        type="text" 
+                        value={inputNote.title}/>}
+                    <TextField
+                        multiline
+                        className={classes.input}
+                        label={isEmpty? "Take a note..." : "Content"}
+                        onChange={handleChange}
+                        onClick={()=>setIsEmpty(false)}
+                        name="content"
+                        type="text"
+                        rows={isEmpty? 1 : 4}
+                        value={inputNote.content}
+                    />
+                    <Zoom in={!isEmpty}>
+                        <Fab aria-label="add" type="submit" className={classes.button}>
+                            <AddIcon/>
+                        </Fab>
+                    </Zoom>
+                </form>
+            </Card>
+        </div>
+    )
 }
 
 export default InputArea;
